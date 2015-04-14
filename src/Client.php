@@ -11,6 +11,7 @@ class Client
     protected $callback;
     protected $endpoint_authorization_code = 'https://graph.qq.com/oauth2.0/authorize';
     protected $endpoint_access_token = 'https://graph.qq.com/oauth2.0/token';
+    protected $endpoint_open_id = 'https://graph.qq.com/oauth2.0/me';
 
     /**
      * @param array $options
@@ -68,6 +69,33 @@ class Client
         if ($result !== false) {
             parse_str($result, $credentials);
             $result = $credentials;
+        }
+
+        return $result;
+    }
+
+    public function getOpenId($access_token)
+    {
+        $request = [
+            'access_token' => $access_token,
+        ];
+
+        $url = $this->endpoint_open_id . '?' . http_build_query($request);
+        /**
+         * Perform Request
+         */
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        $result = curl_exec($ch);
+        if ($result !== false) {
+            $result = trim($result);
+            $result = ltrim($result, 'callback');
+            $result = ltrim($result, '(');
+            $result = rtrim($result, ';');
+            $result = rtrim($result, ')');
+            $result = json_decode($result, true);
         }
 
         return $result;
