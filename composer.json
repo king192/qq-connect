@@ -1,0 +1,10 @@
+{
+  "name": "zerozh/qq-connect",
+  "description": "QQ Connect",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "QQConnect\\": "src/"
+    }
+  }
+}
