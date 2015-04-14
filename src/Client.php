@@ -34,9 +34,8 @@ class Client
         }
     }
 
-    public function generateRedirectUrl($callback, $scope = '')
+    public function generateRedirectUrl($state, $scope = '')
     {
-        $state = '123456';
         $request = [
             'response_type' => 'code',
             'client_id' => $this->app_id,
