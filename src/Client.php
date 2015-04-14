@@ -8,7 +8,9 @@ class Client
 {
     protected $app_id;
     protected $app_key;
+    protected $callback;
     protected $endpoint_authorization_code = 'https://graph.qq.com/oauth2.0/authorize';
+    protected $endpoint_access_token = 'https://graph.qq.com/oauth2.0/token';
 
     /**
      * @param array $options
@@ -22,6 +24,7 @@ class Client
 
         $this->app_id = $options['app_id'];
         $this->app_key = $options['app_key'];
+        $this->callback = $options['callback'];
 
         if (isset($options['endpoint'])) {
             $this->endpoint = $options['endpoint'];
@@ -37,10 +40,32 @@ class Client
         $request = [
             'response_type' => 'code',
             'client_id' => $this->app_id,
-            'redirect_uri' => urlencode($callback),
+            'redirect_uri' => $this->callback,
             'state' => $state
         ];
 
         return $this->endpoint_authorization_code . '?' . http_build_query($request);
+    }
+
+    public function getAccessToken($code)
+    {
+        $request = [
+            'grant_type' => 'authorization_code',
+            'client_id' => $this->app_id,
+            'client_secret' => $this->app_key,
+            'redirect_uri' => $this->callback,
+            'code' => $code
+        ];
+
+        $url = $this->endpoint_authorization_code . '?' . http_build_query($request);
+        /**
+         * Perform Request
+         */
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        $result = curl_exec($ch);
+
+        return $result;
     }
 }
